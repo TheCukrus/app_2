@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        #window_main {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, 10em);
+            grid-auto-rows: 10em;
+
+            gap: 1em;
+        }
+
+        .ticket {
+            background-color: beige;
+        }
+
+        #window_add,
+        #window_remove,
+        #window_status {
+            width: 200px;
+            display: grid;
+            background-color: beige;
+        }
+    </style>
+
+    <script>
+
+        //
+        //get_tickets
+        //
+
+        const get_tickets = function ()
+        {
+            const XMLHttpRequest1 = new XMLHttpRequest();
+            XMLHttpRequest1.open("GET", "/api/tickets", false);
+            XMLHttpRequest1.setRequestHeader("Content-Type", "text/plain; charset=UTF-8");
+            XMLHttpRequest1.send();
+
+            return XMLHttpRequest1.responseText;
+        }
+
+        //
+        //add_ticket
+        //
+
+        const add_ticket = function (year, month, day, h, min)
+        {
+            const temp = {};
+            temp.year = year;
+            temp.month = month;
+            temp.day = day;
+            temp.h = h;
+            temp.min = min;
+
+            const XMLHttpRequest1 = new XMLHttpRequest();
+            XMLHttpRequest1.open("POST", "/api/add_ticket", false);
+            XMLHttpRequest1.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+            XMLHttpRequest1.send(JSON.stringify(temp));
+
+            return XMLHttpRequest1.responseText;
+        }
+
+        //
+        //remove_ticket
+        //
+
+        const remove_ticket = function (uid)
+        {
+            const temp = {};
+            temp.uid = uid;
+
+            const XMLHttpRequest1 = new XMLHttpRequest();
+            XMLHttpRequest1.open("POST", "/api/remove_ticket", false);
+            XMLHttpRequest1.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+            XMLHttpRequest1.send(JSON.stringify(temp));
+
+            return XMLHttpRequest1.responseText;
+        }
+
+    </script>
+
+</head>
+
+<body>
+
+    <div id="window_status"></div>
+
+    <div id="window_add">
+        <input type="text" id="window_add_input_year" placeholder="2021">
+        <input type="text" id="window_add_input_month" placeholder="12">
+        <input type="text" id="window_add_input_day" placeholder="10">
+        <input type="text" id="window_add_input_h" placeholder="10">
+        <input type="text" id="window_add_input_min" placeholder="00">
+        <button id="window_add_button_add">add</button>
+    </div>
+
+    <div id="window_remove">
+        <div id="window_remove_uid">uid</div>
+        <button id="window_remove_button_remove">remove</button>
+    </div>
+
+    <script>
+
+        //
+        //window_add_button_add
+        //
+
+        document.getElementById("window_add_button_add").addEventListener("click", function ()
+        {
+            const result = add_ticket(
+                document.getElementById("window_add_input_year").value,
+                document.getElementById("window_add_input_month").value,
+                document.getElementById("window_add_input_day").value,
+                document.getElementById("window_add_input_h").value,
+                document.getElementById("window_add_input_min").value
+            );
+
+            document.getElementById("window_status").innerHTML = result;
+
+            redraw_main();
+        });
+
+        //
+        //window_remove_button_remove
+        //
+
+        document.getElementById("window_remove_button_remove").addEventListener("click", function ()
+        {
+            const result = remove_ticket(
+                document.getElementById("window_remove_uid").innerHTML
+            );
+
+            document.getElementById("window_status").innerHTML = result;
+
+            redraw_main();
+        });
+
+    </script>
+
+    <div id="window_main"></div>
+
+    <script>
+
+        const redraw_main = function ()
+        {
+            const temp = get_tickets();
+            const arr = JSON.parse(temp);
+
+
+            while (document.getElementById("window_main").firstChild)
+            {
+                document.getElementById("window_main").firstChild.remove();
+            }
+
+            for (let obj of arr)
+            {
+                const ticket = document.createElement("button");
+                ticket.className = "ticket";
+
+                ticket.appendChild(document.createElement("div"));
+                ticket.lastChild.innerHTML = obj.uid;
+                ticket.appendChild(document.createElement("div"));
+                ticket.lastChild.innerHTML = `${obj.year}-${obj.month}-${obj.day}`;
+                ticket.appendChild(document.createElement("div"));
+                ticket.lastChild.innerHTML = `${obj.h}:${obj.min}`;
+
+                document.getElementById("window_main").appendChild(ticket);
+
+                ticket.addEventListener("click", function ()
+                {
+                    document.getElementById("window_remove_uid").innerHTML = obj.uid;
+                })
+            }
+        }
+
+        redraw_main();
+
+    </script>
+
+</body>
+
+</html>

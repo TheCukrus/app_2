@@ -1,0 +1,10 @@
+{
+    "type": "module",
+    "name": "test1",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {},
+    "scripts": {
+        "start": "node app.js"
+    }
+}
