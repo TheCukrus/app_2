@@ -68,9 +68,13 @@ const http1 = createServer(function (req, res)
 
                 let result = "operation completed successfully";
                 let prop;
-                
+
                 try
                 {
+                    //
+                    //input verification to do
+                    //
+
                     //year
                     prop = "year";
                     if (temp.hasOwnProperty(prop) === false) throw `property [${prop}] not found`;
@@ -78,7 +82,10 @@ const http1 = createServer(function (req, res)
                     //month
                     prop = "month";
                     if (temp.hasOwnProperty(prop) === false) throw `property [${prop}] not found`;
-                    if ((/^(1)([0-2])$/.test(temp[prop]) === false) && (/^(1)([0-2])$/.test(temp.month) === false)) throw `property [${prop}] failed RegExp tests`;
+                    if (parseInt(temp[prop]) === NaN) throw `property [${prop}] is not a number`;
+                    if (parseInt(temp[prop]) < 1) throw `property [${prop}] is not < 0`;
+                    if (parseInt(temp[prop]) > 12) throw `property [${prop}] is not > 12`;
+                    // if ((/^(1-9)([0-2])$/.test(temp[prop]) === false) && (/^(1)([0-2])$/.test(temp.month) === false)) throw `property [${prop}] failed RegExp tests`;
                     //day
                     prop = "day";
                     if (temp.hasOwnProperty(prop) === false) throw `property [${prop}] not found`;
@@ -86,9 +93,25 @@ const http1 = createServer(function (req, res)
                     const max_day_in_what_month = new Date(temp.year, temp.month, 0).getDate();
                     if ((parseInt(temp.day) < 1) || (parseInt(temp.day) > max_day_in_what_month)) throw `property [${prop}] invalid day`;
                     //h
-
+                    prop = "h";
+                    if (temp.hasOwnProperty(prop) === false) throw `property [${prop}] not found`;
+                    if (parseInt(temp[prop]) === NaN) throw `property [${prop}] is not a number`;
+                    if (parseInt(temp[prop]) < 0) throw `property [${prop}] is not < 0`;
+                    if (parseInt(temp[prop]) > 23) throw `property [${prop}] is not > 23`;
                     //min
+                    prop = "min";
+                    if (temp.hasOwnProperty(prop) === false) throw `property [${prop}] not found`;
+                    if (parseInt(temp[prop]) === NaN) throw `property [${prop}] is not a number`;
+                    if (parseInt(temp[prop]) < 0) throw `property [${prop}] is not < 0`;
+                    if (parseInt(temp[prop]) > 59) throw `property [${prop}] is not > 59`;
 
+
+                    //
+                    //
+                    //
+
+
+                    
                     //db.add
                     if (db.add(parseInt(temp.year), parseInt(temp.month), parseInt(temp.day), parseInt(temp.h), parseInt(temp.min)) === 0) throw `uid already exists`;
                 }
